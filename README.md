@@ -10,7 +10,6 @@ The goal is to replicate how a data analyst would explore a large, event-level d
 ## 🧰 Tech Stack
 - 🗄️ SQL (Google BigQuery)
 - 🔗 GitHub for version control
-- 📄 Optional CSV exports for results
 
 ---
 
