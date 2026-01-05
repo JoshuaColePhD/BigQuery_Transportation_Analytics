@@ -18,6 +18,8 @@ The goal is to replicate how a data analyst would explore a large, event-level d
 - **Source:** `bigquery-public-data.new_york_taxi_trips`
 - **Fact table:** `tlc_yellow_trips_2018` (one row per taxi trip)
 - **Dimension table:** `taxi_zone_geom` (lookup table for pickup location context)
+- **Total rows:** 102,871,376 taxi trips
+- **Date coverage:** January 1, 2018 – December 31, 2018
 - **Grain:** one row per taxi trip prior to aggregation
 - **Notes:** This repository stores SQL queries and documentation only. No data is stored locally.
 
