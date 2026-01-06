@@ -1,4 +1,4 @@
-# BigQuery Transportation Analytics Project
+# BigQuery Transportation Analytics
 
 ## 📌 Overview
 This project demonstrates SQL-based analytics using Google BigQuery public datasets. The analysis focuses on understanding patterns in NYC yellow taxi trips through warehouse-style SQL queries, including baseline metrics, segmentation, and trend analysis.
