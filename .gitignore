@@ -1,23 +1,7 @@
-# OS / editor noise
-.DS_Store
-Thumbs.db
-
-# Python virtual environments
-.venv/
-venv/
-
-# Environment / secrets
-.env
-.env.*
-
-# Output artifacts (generated data)
-outputs/extracts/
-outputs/figures/
-
-# Temporary / scratch files
-*.tmp
-*.log
-
-# README 
-READEME.html
-README_files/
+.next/
+node_modules/
+out/
+dist/
+coverage/
+.env*.local
+npm-debug.log*

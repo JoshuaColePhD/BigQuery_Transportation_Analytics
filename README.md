@@ -1,117 +1,156 @@
 # BigQuery Transportation Analytics
 
-## 📌 Overview
-This project demonstrates SQL-based analytics using Google BigQuery public datasets. The analysis focuses on understanding patterns in NYC yellow taxi trips through warehouse-style SQL queries, including baseline metrics, segmentation, and trend analysis.
+Taxi trip volume is easy to summarize and easy to misunderstand.
 
-The goal is to replicate how a data analyst would explore a large, event-level dataset to establish baseline behavior, identify key drivers of volume and value, and flag notable deviations from normal activity.
+A city can have more than 100 million rides in a year and still leave leaders with a blurry operating question: is demand changing, where is the system carrying the most load, and which segments produce the most value per trip?
 
----
+This project answers those questions with a compact SQL workflow on the Google BigQuery public NYC yellow taxi dataset, then translates the results into an executive dashboard styled after the HR Attrition survival dashboard.
 
-## 🧰 Tech Stack
-- 🗄️ SQL (Google BigQuery)
-- 🔗 GitHub for version control
+**Live dashboard:** deploy this repository to Vercel after connecting the project  
+**Dataset:** `bigquery-public-data.new_york_taxi_trips`
 
----
+## The Story
 
-## 🗃️ Dataset
-- **Source:** `bigquery-public-data.new_york_taxi_trips`
-- **Fact table:** `tlc_yellow_trips_2018` (one row per taxi trip)
-- **Dimension table:** `taxi_zone_geom` (lookup table for pickup location context)
-- **Total rows:** 102,871,376 taxi trips
-- **Date coverage:** January 1, 2018 – December 31, 2018
-- **Grain:** one row per taxi trip prior to aggregation
-- **Notes:** This repository stores SQL queries and documentation only. No data is stored locally.
+Imagine an operations leader looking at a full year of NYC taxi trips. The headline number is large: **102,871,376 trips** in 2018. But that number does not say whether traffic is structurally rising or falling, whether demand is geographically broad, or whether high-volume areas also produce high per-trip revenue.
 
----
+That is the blind spot this project is built around.
 
-## ❓ Business Questions
-1. 📈 How does taxi traffic change over time?
-2. 📍 Where does taxi traffic come from (by location and fare patterns)?
-3. 💵 How does revenue per trip differ across segments?
-4. 🚨 Are there notable trends or anomalies in traffic?
+The SQL workflow treats the taxi table like an event-level fact table. It starts with data validation, moves into time-series traffic patterns, joins trips to pickup geography, segments fares into business-readable buckets, compares revenue per trip by borough, and flags anomalous days for review.
 
----
+The result is a clearer transportation analytics question:
 
-## 📊 Findings
+**Which segments drive system load, and which segments drive value?**
 
-### 🔍 Executive Summary
+## What the Analysis Found
 
-| Question | Key Metric | Result |
-|---|---|---|
-| Traffic over time | Daily trip volume | Stable baseline with strong weekly seasonality |
-| Traffic by location | Share of pickups (Manhattan) | **90.6%** of all trips |
-| Traffic by fare | Trips under $25 | **86.3%** of total volume |
-| Value by location | Avg revenue per trip (Manhattan) | **$14.32** |
-| High-value segment | Avg revenue per trip (EWR) | **$91.86** |
-| Anomalies | Sustained deviations | None observed (episodic deviations only) |
+The clearest signal is geographic concentration.
 
-### 1️⃣ Traffic Over Time
-Daily taxi trip volume in 2018 is relatively stable, exhibiting strong weekly seasonality with predictable weekday–weekend fluctuations. Outside of short-term variation and isolated dips, there is no sustained upward or downward trend in overall traffic. The sharp decline observed at the end of the series reflects data coverage limits rather than a real change in demand.
+Manhattan accounts for approximately **90.6% of all pickups**, meaning total system volume is overwhelmingly shaped by Manhattan activity. But volume and value do not move together. Manhattan has the lowest average revenue per trip at about **$14.32**, while EWR-origin trips average about **$91.86** despite representing a very small share of total volume.
 
----
+| Finding | Evidence | What it means for decision-makers |
+| --- | ---: | --- |
+| Demand is highly concentrated | Manhattan = 90.6% of pickups | Start volume planning with Manhattan because it defines the operating baseline. |
+| Most rides are short-to-mid fare trips | 86.3% of trips are under $25 | System load is driven by frequent, lower-value rides. |
+| Per-trip value differs sharply by origin | EWR = $91.86 average revenue | Small-volume segments can matter disproportionately for revenue strategy. |
+| Weekly trend is stable | No sustained rise or fall in 2018 | Observed deviations are episodic rather than structural. |
+| Anomaly flags are interpretable | Holiday and disruption dips dominate | Investigate specific days before assuming trend change. |
 
-### 2️⃣ Traffic Composition by Location and Fare
+## From Query to Action
 
-#### 📍 Traffic by Pickup Location
-Taxi trip volume is extremely concentrated geographically. Manhattan accounts for approximately **90.6% of all pickups**, while Queens and Brooklyn contribute **6.4%** and **1.3%** respectively. All other boroughs together represent less than **0.2%** of total trips. This indicates that overall taxi demand in 2018 is overwhelmingly driven by activity within Manhattan, with outer boroughs playing a comparatively minor role in total trip volume.
+The practical value of this analysis is not that it identifies one magic borough or fare bucket. It gives transportation analysts a sequence for decision-making.
 
-#### 💲 Traffic by Fare Pattern
-Fare distributions show that taxi traffic is primarily driven by low- to mid-priced trips. Approximately **48.6%** of trips fall within the **$10–$25** range, while an additional **37.7%** cost under **$10**. Trips exceeding **$50** account for only **4.5%** of total volume, indicating that system usage is dominated by frequent, short-distance rides rather than infrequent high-value fares.
+1. **Validate the grain and coverage.** Confirm row count, date boundaries, and critical fields before interpreting aggregates.
+2. **Separate baseline traffic from noise.** Use weekly aggregation to smooth daily volatility and avoid overreacting to isolated dips.
+3. **Keep volume and value separate.** Manhattan drives total pickups, while airport-linked origins can drive higher per-trip revenue.
+4. **Use fare buckets for operating language.** The split between under-$10, $10-$25, $25-$50, and $50+ trips makes the distribution easier to communicate.
+5. **Treat anomalies as prompts, not conclusions.** Flag unusual days, then attach context such as holidays, storms, or data coverage limits.
 
-*Together, these findings suggest that overall taxi traffic in 2018 is driven by frequent, short-distance trips concentrated in Manhattan, rather than by high-value or geographically dispersed rides.*
+## The Dashboard
 
----
+The dashboard turns the SQL findings into an executive BI view. The goal is to help a viewer understand the transportation story quickly: where trip volume is concentrated, how fare distribution shapes system load, and where value per trip diverges from pickup share.
 
-### 3️⃣ Revenue per Trip by Location
-Average revenue per trip varies substantially by pickup borough. While Manhattan accounts for the vast majority of trip volume, it exhibits the lowest average revenue per trip at approximately **$14.32**, reflecting a high frequency of short-distance rides. In contrast, outer boroughs generate fewer trips but higher average revenue per ride. Trips originating near **EWR (Newark Airport)** show the highest average revenue per trip (approximately **$91.86**), despite representing a very small share of total volume.
+Dashboard features:
 
-These patterns indicate that overall trip volume and per-trip value are not aligned across locations. High-demand areas drive system usage through frequent, low-value trips, while lower-volume segments contribute disproportionately higher revenue per trip.
+- KPI strip for trip rows, Manhattan share, sub-$25 trips, revenue per trip, and trend signal
+- Filter controls for pickup borough, fare bucket, and planning lens
+- Summary charts for weekly traffic, pickup mix, and fare composition
+- Location/value view comparing trip share with average revenue per trip
+- Anomaly watchlist with interpretable day-level flags
+- Query workflow table linking each script to its business question and output
 
----
+The visual system follows the HR Attrition dashboard: deep navy gradient shell, compact KPI cards, squared-off controls, ocean/gold/ember/plum accents, dense executive panels, and concise decision-support copy.
 
-### 4️⃣ Trends and Anomalies
-Daily trip volume shows expected short-term fluctuations around a stable baseline. Several isolated days exhibit significantly higher or lower traffic than average, consistent with holidays or short-term disruptions. Weekly aggregation smooths daily noise and confirms the absence of any sustained upward or downward trend across the year, suggesting normal operational variability rather than structural change in demand.
+## Methodology
 
----
+### Data
 
-## 🗂️ Project Structure
+| Attribute | Value |
+| --- | --- |
+| Source | Google BigQuery public datasets |
+| Dataset | `bigquery-public-data.new_york_taxi_trips` |
+| Fact table | `tlc_yellow_trips_2018` |
+| Dimension table | `taxi_zone_geom` |
+| Unit of analysis | Taxi trip |
+| Rows | 102,871,376 |
+| Date coverage | January 1, 2018 to December 31, 2018 |
+| Stored locally | No source data; SQL and documentation only |
+
+### SQL Workflow
+
+| Script | Purpose |
+| --- | --- |
+| `sql/00_sanity_checks.sql` | Confirm row count, date coverage, missing fields, and raw row shape. |
+| `sql/01_daily_traffic_over_time.sql` | Aggregate trips to one row per day. |
+| `sql/01a_weekly_traffic_trend.sql` | Smooth daily volatility with weekly traffic counts. |
+| `sql/02a_trips_by_pickup_borough.sql` | Join pickup location to borough and calculate trip share. |
+| `sql/02b_fare_buckets.sql` | Bucket trips by total fare size and calculate distribution. |
+| `sql/03a_revenue_per_trip_by_borough.sql` | Compare total and average revenue per trip by pickup borough. |
+| `sql/04_anomalous_days.sql` | Flag days outside 60%-140% of average daily volume. |
+
+## Reproducing the Project
+
+### Run the Dashboard Locally
+
+```bash
+npm install
+npm run dev
 ```
-ad-hoc–bigquery-transportation-analytics
-├── .gitignore
-├── README.md
-└── sql
-├── 00_sanity_checks.sql
-├── 01_daily_traffic_over_time.sql
-├── 01a_weekly_traffic_trend.sql
-├── 02a_trips_by_pickup_borough.sql
-├── 02b_fare_buckets.sql
-├── 03a_revenue_per_trip_by_borough.sql
-└── 04_anomalous_days.sql
-*Note: No output files are committed; results are reproducible by running the SQL scripts.*
+
+Open `http://localhost:3000`.
+
+### Run Dashboard Checks
+
+```bash
+npm test
+npm run build
 ```
-SQL scripts are numbered to reflect the analytical workflow, from data validation and baseline analysis through segmentation, value comparison, and anomaly detection.
 
----
+### Run the SQL
 
-## 🧠 Key Skills Demonstrated
-- Ad-hoc reporting
-- Time-series analysis
+1. Open the Google BigQuery Console.
+2. Enable BigQuery Public Datasets.
+3. Run the scripts in the `sql/` directory in numeric order.
+
+## Deploying to Vercel
+
+This repository is now Vercel-ready as a Next.js app.
+
+```bash
+npm install
+npm run build
+npx vercel
+```
+
+After deployment, replace the live dashboard line at the top of this README with the production Vercel URL.
+
+## Project Structure
+
+```text
+ad-hoc-bigquery-transportation-analytics/
+├── app/                         # Next.js route and global styles
+├── components/                  # Executive dashboard UI components
+├── lib/                         # Static dashboard metrics and helpers
+├── sql/                         # BigQuery analysis scripts
+├── tests/                       # Dashboard rendering tests
+├── package.json
+├── tailwind.config.ts
+├── tsconfig.json
+└── README.md
+```
+
+## Portfolio Skills Demonstrated
+
+- Ad-hoc SQL analytics in BigQuery
 - Fact-to-dimension joins
+- Time-series aggregation and anomaly flagging
 - Segmentation and distribution analysis
-- Grain control and validation
-- Careful interpretation of trends and anomalies
+- Revenue-per-trip comparison
+- Executive-facing dashboard design
+- TypeScript and Next.js implementation
+- Translation of warehouse queries into decision-support storytelling
 
----
+## Contact
 
-## ▶️ How to Reproduce
-1. Open the Google BigQuery Console
-2. Enable BigQuery Public Datasets
-3. Run the SQL scripts in the `/sql` directory in numeric order
-
----
-
-## ⚠️ Assumptions & Limitations
-- Analysis is descriptive, not causal
-- Public dataset limitations apply
-- Results reflect 2018 NYC yellow taxi trips only
-- No local data storage; all queries run in BigQuery
+**Joshua Cole, PhD**  
+People Analytics / Data Analytics  
+GitHub: https://github.com/JoshuaColePhD
