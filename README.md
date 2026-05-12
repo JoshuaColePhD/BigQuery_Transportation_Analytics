@@ -54,6 +54,7 @@ Dashboard features:
 - KPI strip for trip rows, Manhattan share, sub-$25 trips, revenue per trip, and trend signal
 - Filter controls for pickup borough, fare bucket, and planning lens
 - Summary charts for weekly traffic, pickup mix, and fare composition
+- Taxi-zone SVG choropleth with trip-share and average-revenue toggles
 - Location/value view comparing trip share with average revenue per trip
 - Anomaly watchlist with interpretable day-level flags
 - Query workflow table linking each script to its business question and output
@@ -73,7 +74,7 @@ The visual system follows the HR Attrition dashboard: deep navy gradient shell, 
 | Unit of analysis | Taxi trip |
 | Rows | 102,871,376 |
 | Date coverage | January 1, 2018 to December 31, 2018 |
-| Stored locally | No source data; SQL and documentation only |
+| Stored locally | No raw trip-level source data; only SQL, documentation, and a derived aggregate taxi-zone GeoJSON artifact |
 
 ### SQL Workflow
 
@@ -86,6 +87,7 @@ The visual system follows the HR Attrition dashboard: deep navy gradient shell, 
 | `sql/02b_fare_buckets.sql` | Bucket trips by total fare size and calculate distribution. |
 | `sql/03a_revenue_per_trip_by_borough.sql` | Compare total and average revenue per trip by pickup borough. |
 | `sql/04_anomalous_days.sql` | Flag days outside 60%-140% of average daily volume. |
+| `sql/05_pickup_zone_map.sql` | Export aggregate taxi-zone metrics and simplified GeoJSON geometry for the dashboard map. |
 
 ## Reproducing the Project
 
@@ -130,6 +132,7 @@ ad-hoc-bigquery-transportation-analytics/
 ├── app/                         # Next.js route and global styles
 ├── components/                  # Executive dashboard UI components
 ├── lib/                         # Static dashboard metrics and helpers
+├── public/                      # Derived aggregate GeoJSON map artifact
 ├── sql/                         # BigQuery analysis scripts
 ├── tests/                       # Dashboard rendering tests
 ├── package.json
@@ -145,6 +148,7 @@ ad-hoc-bigquery-transportation-analytics/
 - Time-series aggregation and anomaly flagging
 - Segmentation and distribution analysis
 - Revenue-per-trip comparison
+- Static geospatial dashboard design with aggregate GeoJSON
 - Executive-facing dashboard design
 - TypeScript and Next.js implementation
 - Translation of warehouse queries into decision-support storytelling

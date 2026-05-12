@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Area,
   AreaChart,
@@ -32,9 +32,11 @@ import {
   weeklyTraffic,
 } from "@/lib/dashboard-data";
 import { DashboardHeader, DashboardShell, KpiCard, Panel, QueryTable } from "@/components/dashboard-kit";
+import { TaxiZoneMap } from "@/components/taxi-zone-map";
 
 const tabs: Array<{ id: DashboardTab; label: string }> = [
   { id: "summary", label: "Summary" },
+  { id: "geospatial", label: "Geospatial" },
   { id: "location-value", label: "Location + Value" },
   { id: "query-workflow", label: "Query Workflow" },
 ];
@@ -46,9 +48,25 @@ const defaultFilters: Record<FilterKey, string> = {
   view: "portfolio",
 };
 
+function isDashboardTab(value: string): value is DashboardTab {
+  return tabs.some((tab) => tab.id === value);
+}
+
 export function DashboardView() {
   const [selectedTab, setSelectedTab] = useState<DashboardTab>("summary");
   const [filters, setFilters] = useState(defaultFilters);
+
+  useEffect(() => {
+    const hashTab = window.location.hash.replace("#", "");
+    if (isDashboardTab(hashTab)) {
+      setSelectedTab(hashTab);
+    }
+  }, []);
+
+  const handleTabChange = (tab: DashboardTab) => {
+    setSelectedTab(tab);
+    window.history.replaceState(null, "", `#${tab}`);
+  };
 
   const selectedBoroughRows = useMemo(
     () => (filters.borough === "all" ? boroughMetrics : boroughMetrics.filter((row) => row.borough === filters.borough)),
@@ -83,7 +101,7 @@ export function DashboardView() {
             filters={filters}
             filterDefinitions={filterDefinitions}
             activeFilterCount={activeFilterCount}
-            onTabChange={setSelectedTab}
+            onTabChange={handleTabChange}
             onFilterChange={(key, value) => setFilters((current) => ({ ...current, [key]: value }))}
             onResetFilters={() => setFilters(defaultFilters)}
           />
@@ -130,6 +148,13 @@ export function DashboardView() {
                     </PieChart>
                   </ResponsiveContainer>
                 </div>
+                <button
+                  type="button"
+                  onClick={() => handleTabChange("geospatial")}
+                  className="mt-3 w-full rounded-[3px] border border-[#4d8abb] bg-[#10385f] px-3 py-2 text-xs font-semibold uppercase tracking-[0.08em] text-sand transition hover:border-[#7bbdff]"
+                >
+                  Open taxi-zone map
+                </button>
               </Panel>
 
               <Panel title="Fare Composition" subtitle="Trip volume is dominated by low-to-mid-priced rides.">
@@ -147,6 +172,8 @@ export function DashboardView() {
               </Panel>
             </div>
           ) : null}
+
+          {selectedTab === "geospatial" ? <TaxiZoneMap selectedBorough={filters.borough} /> : null}
 
           {selectedTab === "location-value" ? (
             <div className="grid min-w-0 gap-4 xl:grid-cols-2">

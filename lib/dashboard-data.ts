@@ -1,4 +1,4 @@
-export type DashboardTab = "summary" | "location-value" | "query-workflow";
+export type DashboardTab = "summary" | "geospatial" | "location-value" | "query-workflow";
 export type FilterKey = "borough" | "fareBucket" | "view";
 
 export type KpiMetric = {
@@ -134,6 +134,7 @@ export const querySteps: QueryStep[] = [
   { file: "02b_fare_buckets.sql", question: "What fare patterns drive volume?", metric: "Trips and share by fare bucket", output: "86.3% of trips are under $25" },
   { file: "03a_revenue_per_trip_by_borough.sql", question: "Where is per-trip value highest?", metric: "Average total amount by borough", output: "EWR leads at $91.86 per trip despite tiny volume" },
   { file: "04_anomalous_days.sql", question: "Are deviations sustained or episodic?", metric: "Days outside 60%-140% of average", output: "No sustained structural break in the 2018 series" },
+  { file: "05_pickup_zone_map.sql", question: "Where do pickup concentration and value appear spatially?", metric: "Zone-level trips, share, revenue, and GeoJSON geometry", output: "Static aggregate map layer for taxi-zone choropleth views" },
 ];
 
 export function formatNumber(value: number) {

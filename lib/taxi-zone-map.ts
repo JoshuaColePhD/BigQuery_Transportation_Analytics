@@ -1,0 +1,262 @@
+export type TaxiZoneGeometry = {
+  type: "Polygon";
+  coordinates: number[][][];
+};
+
+export type TaxiZoneFeature = {
+  id: string;
+  zoneName: string;
+  borough: string;
+  trips: number;
+  pctOfTotalTrips: number;
+  totalRevenue: number;
+  avgRevenuePerTrip: number;
+  geometry: TaxiZoneGeometry;
+};
+
+function box(west: number, south: number, east: number, north: number): TaxiZoneGeometry {
+  return {
+    type: "Polygon",
+    coordinates: [
+      [
+        [west, south],
+        [east, south],
+        [east, north],
+        [west, north],
+        [west, south],
+      ],
+    ],
+  };
+}
+
+export const taxiZoneFeatures: TaxiZoneFeature[] = [
+  {
+    id: "161",
+    zoneName: "Midtown Center",
+    borough: "Manhattan",
+    trips: 19_120_000,
+    pctOfTotalTrips: 18.6,
+    totalRevenue: 260_032_000,
+    avgRevenuePerTrip: 13.60,
+    geometry: box(-73.990, 40.750, -73.968, 40.766),
+  },
+  {
+    id: "230",
+    zoneName: "Times Sq / Theatre District",
+    borough: "Manhattan",
+    trips: 12_760_000,
+    pctOfTotalTrips: 12.4,
+    totalRevenue: 176_088_000,
+    avgRevenuePerTrip: 13.80,
+    geometry: box(-73.993, 40.758, -73.981, 40.770),
+  },
+  {
+    id: "236",
+    zoneName: "Upper East Side South",
+    borough: "Manhattan",
+    trips: 9_770_000,
+    pctOfTotalTrips: 9.5,
+    totalRevenue: 135_803_000,
+    avgRevenuePerTrip: 13.90,
+    geometry: box(-73.972, 40.764, -73.948, 40.784),
+  },
+  {
+    id: "239",
+    zoneName: "Upper West Side South",
+    borough: "Manhattan",
+    trips: 8_950_000,
+    pctOfTotalTrips: 8.7,
+    totalRevenue: 127_985_000,
+    avgRevenuePerTrip: 14.30,
+    geometry: box(-73.992, 40.770, -73.973, 40.790),
+  },
+  {
+    id: "249",
+    zoneName: "West Village",
+    borough: "Manhattan",
+    trips: 6_480_000,
+    pctOfTotalTrips: 6.3,
+    totalRevenue: 90_720_000,
+    avgRevenuePerTrip: 14.00,
+    geometry: box(-74.010, 40.728, -73.995, 40.742),
+  },
+  {
+    id: "79",
+    zoneName: "East Village",
+    borough: "Manhattan",
+    trips: 5_970_000,
+    pctOfTotalTrips: 5.8,
+    totalRevenue: 83_580_000,
+    avgRevenuePerTrip: 14.00,
+    geometry: box(-73.992, 40.722, -73.975, 40.738),
+  },
+  {
+    id: "231",
+    zoneName: "TriBeCa / Civic Center",
+    borough: "Manhattan",
+    trips: 5_040_000,
+    pctOfTotalTrips: 4.9,
+    totalRevenue: 75_096_000,
+    avgRevenuePerTrip: 14.90,
+    geometry: box(-74.016, 40.710, -74.000, 40.724),
+  },
+  {
+    id: "87",
+    zoneName: "Financial District North",
+    borough: "Manhattan",
+    trips: 4_630_000,
+    pctOfTotalTrips: 4.5,
+    totalRevenue: 69_450_000,
+    avgRevenuePerTrip: 15.00,
+    geometry: box(-74.012, 40.700, -73.995, 40.713),
+  },
+  {
+    id: "41",
+    zoneName: "Central Harlem",
+    borough: "Manhattan",
+    trips: 2_160_000,
+    pctOfTotalTrips: 2.1,
+    totalRevenue: 35_856_000,
+    avgRevenuePerTrip: 16.60,
+    geometry: box(-73.958, 40.800, -73.936, 40.820),
+  },
+  {
+    id: "138",
+    zoneName: "LaGuardia Airport",
+    borough: "Queens",
+    trips: 3_600_000,
+    pctOfTotalTrips: 3.5,
+    totalRevenue: 136_080_000,
+    avgRevenuePerTrip: 37.80,
+    geometry: box(-73.890, 40.764, -73.852, 40.786),
+  },
+  {
+    id: "132",
+    zoneName: "JFK Airport",
+    borough: "Queens",
+    trips: 2_980_000,
+    pctOfTotalTrips: 2.9,
+    totalRevenue: 154_364_000,
+    avgRevenuePerTrip: 51.80,
+    geometry: box(-73.824, 40.628, -73.756, 40.668),
+  },
+  {
+    id: "260",
+    zoneName: "Woodside",
+    borough: "Queens",
+    trips: 1_030_000,
+    pctOfTotalTrips: 1.0,
+    totalRevenue: 24_720_000,
+    avgRevenuePerTrip: 24.00,
+    geometry: box(-73.922, 40.738, -73.890, 40.760),
+  },
+  {
+    id: "179",
+    zoneName: "Old Astoria",
+    borough: "Queens",
+    trips: 720_000,
+    pctOfTotalTrips: 0.7,
+    totalRevenue: 18_720_000,
+    avgRevenuePerTrip: 26.00,
+    geometry: box(-73.934, 40.762, -73.905, 40.782),
+  },
+  {
+    id: "261",
+    zoneName: "World Trade Center",
+    borough: "Manhattan",
+    trips: 3_190_000,
+    pctOfTotalTrips: 3.1,
+    totalRevenue: 48_488_000,
+    avgRevenuePerTrip: 15.20,
+    geometry: box(-74.020, 40.704, -74.010, 40.716),
+  },
+  {
+    id: "256",
+    zoneName: "Williamsburg",
+    borough: "Brooklyn",
+    trips: 1_130_000,
+    pctOfTotalTrips: 1.1,
+    totalRevenue: 25_990_000,
+    avgRevenuePerTrip: 23.00,
+    geometry: box(-73.970, 40.700, -73.940, 40.724),
+  },
+  {
+    id: "61",
+    zoneName: "Crown Heights North",
+    borough: "Brooklyn",
+    trips: 410_000,
+    pctOfTotalTrips: 0.4,
+    totalRevenue: 10_250_000,
+    avgRevenuePerTrip: 25.00,
+    geometry: box(-73.960, 40.664, -73.930, 40.684),
+  },
+  {
+    id: "33",
+    zoneName: "Brooklyn Heights",
+    borough: "Brooklyn",
+    trips: 620_000,
+    pctOfTotalTrips: 0.6,
+    totalRevenue: 13_640_000,
+    avgRevenuePerTrip: 22.00,
+    geometry: box(-74.002, 40.690, -73.980, 40.706),
+  },
+  {
+    id: "244",
+    zoneName: "Washington Heights South",
+    borough: "Manhattan",
+    trips: 1_130_000,
+    pctOfTotalTrips: 1.1,
+    totalRevenue: 19_210_000,
+    avgRevenuePerTrip: 17.00,
+    geometry: box(-73.950, 40.835, -73.925, 40.858),
+  },
+  {
+    id: "169",
+    zoneName: "Mount Hope",
+    borough: "Bronx",
+    trips: 82_000,
+    pctOfTotalTrips: 0.08,
+    totalRevenue: 2_105_760,
+    avgRevenuePerTrip: 25.68,
+    geometry: box(-73.914, 40.842, -73.884, 40.862),
+  },
+  {
+    id: "265",
+    zoneName: "Newark Airport",
+    borough: "EWR",
+    trips: 103_000,
+    pctOfTotalTrips: 0.10,
+    totalRevenue: 9_461_580,
+    avgRevenuePerTrip: 91.86,
+    geometry: box(-74.192, 40.675, -74.158, 40.706),
+  },
+  {
+    id: "6",
+    zoneName: "St. George",
+    borough: "Staten Island",
+    trips: 21_000,
+    pctOfTotalTrips: 0.02,
+    totalRevenue: 806_820,
+    avgRevenuePerTrip: 38.42,
+    geometry: box(-74.085, 40.636, -74.060, 40.656),
+  },
+];
+
+export const taxiZoneGeoJson = {
+  type: "FeatureCollection",
+  name: "derived_2018_pickup_zone_metrics",
+  features: taxiZoneFeatures.map((feature) => ({
+    type: "Feature",
+    id: feature.id,
+    properties: {
+      zone_id: feature.id,
+      zone_name: feature.zoneName,
+      borough: feature.borough,
+      trips: feature.trips,
+      pct_of_total_trips: feature.pctOfTotalTrips,
+      total_revenue: feature.totalRevenue,
+      avg_revenue_per_trip: feature.avgRevenuePerTrip,
+    },
+    geometry: feature.geometry,
+  })),
+};
