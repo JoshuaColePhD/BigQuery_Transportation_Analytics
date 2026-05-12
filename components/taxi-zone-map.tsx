@@ -10,8 +10,131 @@ const svgWidth = 760;
 const svgHeight = 620;
 const boundsPadding = 28;
 
-function getBounds(features: TaxiZoneFeature[]) {
-  const points = features.flatMap((feature) => feature.geometry.coordinates.flat());
+type BasemapArea = {
+  id: string;
+  label: string;
+  fill: string;
+  labelPoint: [number, number];
+  coordinates: number[][];
+};
+
+type AirportMarker = {
+  id: string;
+  label: string;
+  point: [number, number];
+};
+
+const basemapAreas: BasemapArea[] = [
+  {
+    id: "manhattan",
+    label: "Manhattan",
+    fill: "#24445f",
+    labelPoint: [-73.977, 40.782],
+    coordinates: [
+      [-74.020, 40.700],
+      [-74.012, 40.725],
+      [-74.002, 40.755],
+      [-73.988, 40.790],
+      [-73.952, 40.868],
+      [-73.922, 40.872],
+      [-73.934, 40.835],
+      [-73.948, 40.795],
+      [-73.962, 40.754],
+      [-73.986, 40.704],
+      [-74.020, 40.700],
+    ],
+  },
+  {
+    id: "bronx",
+    label: "Bronx",
+    fill: "#453a56",
+    labelPoint: [-73.885, 40.845],
+    coordinates: [
+      [-73.936, 40.800],
+      [-73.900, 40.792],
+      [-73.850, 40.805],
+      [-73.790, 40.845],
+      [-73.800, 40.898],
+      [-73.885, 40.912],
+      [-73.950, 40.880],
+      [-73.936, 40.800],
+    ],
+  },
+  {
+    id: "queens",
+    label: "Queens",
+    fill: "#3b3749",
+    labelPoint: [-73.835, 40.725],
+    coordinates: [
+      [-73.950, 40.740],
+      [-73.900, 40.782],
+      [-73.810, 40.782],
+      [-73.735, 40.735],
+      [-73.730, 40.642],
+      [-73.790, 40.605],
+      [-73.895, 40.645],
+      [-73.950, 40.700],
+      [-73.950, 40.740],
+    ],
+  },
+  {
+    id: "brooklyn",
+    label: "Brooklyn",
+    fill: "#254d52",
+    labelPoint: [-73.945, 40.654],
+    coordinates: [
+      [-74.035, 40.700],
+      [-73.975, 40.724],
+      [-73.885, 40.690],
+      [-73.850, 40.622],
+      [-73.930, 40.570],
+      [-74.060, 40.602],
+      [-74.035, 40.700],
+    ],
+  },
+  {
+    id: "staten-island",
+    label: "Staten Island",
+    fill: "#274f63",
+    labelPoint: [-74.120, 40.590],
+    coordinates: [
+      [-74.245, 40.630],
+      [-74.165, 40.662],
+      [-74.055, 40.640],
+      [-74.055, 40.565],
+      [-74.135, 40.505],
+      [-74.245, 40.535],
+      [-74.245, 40.630],
+    ],
+  },
+  {
+    id: "new-jersey",
+    label: "New Jersey",
+    fill: "#1d3147",
+    labelPoint: [-74.205, 40.745],
+    coordinates: [
+      [-74.300, 40.520],
+      [-74.290, 40.900],
+      [-74.120, 40.910],
+      [-74.100, 40.820],
+      [-74.135, 40.720],
+      [-74.095, 40.630],
+      [-74.160, 40.545],
+      [-74.300, 40.520],
+    ],
+  },
+];
+
+const airportMarkers: AirportMarker[] = [
+  { id: "ewr", label: "EWR", point: [-74.175, 40.690] },
+  { id: "lga", label: "LGA", point: [-73.871, 40.777] },
+  { id: "jfk", label: "JFK", point: [-73.784, 40.645] },
+];
+
+function getBounds(features: TaxiZoneFeature[], areas: BasemapArea[]) {
+  const zonePoints = features.flatMap((feature) => feature.geometry.coordinates.flat());
+  const areaPoints = areas.flatMap((area) => area.coordinates);
+  const points = [...zonePoints, ...areaPoints, ...airportMarkers.map((marker) => marker.point)];
   const longitudes = points.map(([longitude]) => longitude);
   const latitudes = points.map(([, latitude]) => latitude);
 
@@ -23,9 +146,9 @@ function getBounds(features: TaxiZoneFeature[]) {
   };
 }
 
-const mapBounds = getBounds(taxiZoneFeatures);
+const mapBounds = getBounds(taxiZoneFeatures, basemapAreas);
 
-function projectPoint([longitude, latitude]: number[]) {
+function projectPoint([longitude, latitude]: number[] | [number, number]) {
   const x =
     boundsPadding +
     ((longitude - mapBounds.minLongitude) / (mapBounds.maxLongitude - mapBounds.minLongitude)) *
@@ -38,18 +161,39 @@ function projectPoint([longitude, latitude]: number[]) {
   return [x, y];
 }
 
+function pathFromRing(ring: Array<number[] | [number, number]>) {
+  return ring
+    .map((point, index) => {
+      const [x, y] = projectPoint(point);
+      return `${index === 0 ? "M" : "L"} ${x.toFixed(1)} ${y.toFixed(1)}`;
+    })
+    .join(" ")
+    .concat(" Z");
+}
+
+function basemapPath(area: BasemapArea) {
+  return pathFromRing(area.coordinates);
+}
+
 function polygonPath(feature: TaxiZoneFeature) {
   return feature.geometry.coordinates
-    .map((ring) =>
-      ring
-        .map((point, index) => {
-          const [x, y] = projectPoint(point);
-          return `${index === 0 ? "M" : "L"} ${x.toFixed(1)} ${y.toFixed(1)}`;
-        })
-        .join(" ")
-        .concat(" Z"),
-    )
+    .map((ring) => pathFromRing(ring))
     .join(" ");
+}
+
+function AirportIcon({ marker }: { marker: AirportMarker }) {
+  const [x, y] = projectPoint(marker.point);
+
+  return (
+    <g transform={`translate(${x.toFixed(1)} ${y.toFixed(1)})`}>
+      <circle r="10" fill="#F6C85F" stroke="#071321" strokeWidth="2" />
+      <circle r="5.5" fill="#F4727A" opacity="0.9" />
+      <path d="M0 -11 L2 -2 L9 1 L9 4 L1 3 L-2 9 L-5 9 L-3 2 L-10 0 L-10 -3 L-2 -3 Z" fill="#F8FAFC" stroke="#071321" strokeWidth="0.8" />
+      <text x="14" y="-8" fill="#F6C85F" fontSize="14" fontWeight="800" letterSpacing="0.5">
+        {marker.label}
+      </text>
+    </g>
+  );
 }
 
 function getFill(feature: TaxiZoneFeature, metric: MapMetric) {
@@ -130,9 +274,85 @@ export function TaxiZoneMap({ selectedBorough }: { selectedBorough: string }) {
               className="block h-auto w-full"
             >
               <rect width={svgWidth} height={svgHeight} fill="#071321" />
-              <g opacity="0.22">
-                <path d="M96 44 C128 104 130 170 108 246 C91 305 100 363 131 419" stroke="#5BC0EB" strokeWidth="3" fill="none" />
-                <path d="M342 30 C330 110 338 190 360 275 C378 345 362 433 324 582" stroke="#5BC0EB" strokeWidth="2" fill="none" />
+              <g opacity="0.85">
+                {basemapAreas.map((area) => (
+                  <path
+                    key={area.id}
+                    d={basemapPath(area)}
+                    fill={area.fill}
+                    stroke="#68a9ca"
+                    strokeDasharray={area.id === "new-jersey" ? "8 6" : undefined}
+                    strokeWidth={area.id === "new-jersey" ? 1.2 : 1.7}
+                    opacity={area.id === "new-jersey" ? 0.62 : 0.88}
+                  />
+                ))}
+              </g>
+              <g opacity="0.42">
+                <path d="M219 40 C260 116 260 210 236 292 C214 366 216 451 256 552" stroke="#5BC0EB" strokeWidth="5" fill="none" />
+                <path d="M330 44 C313 135 323 226 350 312 C375 392 360 494 316 592" stroke="#5BC0EB" strokeWidth="3.2" fill="none" />
+                <path d="M70 390 C154 351 263 354 358 396 C438 431 515 431 650 385" stroke="#5BC0EB" strokeWidth="2.5" fill="none" />
+              </g>
+              <g>
+                {basemapAreas
+                  .filter((area) => area.id !== "new-jersey")
+                  .map((area) => {
+                    const [x, y] = projectPoint(area.labelPoint);
+                    const isManhattan = area.id === "manhattan";
+
+                    return (
+                      <text
+                        key={`${area.id}-label`}
+                        x={x}
+                        y={y}
+                        fill="#F8FAFC"
+                        fontSize={isManhattan ? 20 : 18}
+                        fontWeight="800"
+                        letterSpacing="0.5"
+                        opacity="0.82"
+                        textAnchor="middle"
+                        transform={isManhattan ? `rotate(-68 ${x} ${y})` : undefined}
+                      >
+                        {area.label.toUpperCase()}
+                      </text>
+                    );
+                  })}
+                {(() => {
+                  const [x, y] = projectPoint([-74.205, 40.740]);
+                  return (
+                    <text x={x} y={y} fill="#F4727A" fontSize="20" fontWeight="800" opacity="0.72" textAnchor="middle">
+                      NEW JERSEY
+                    </text>
+                  );
+                })()}
+                {[
+                  ["Hudson River", [-74.060, 40.790], -66],
+                  ["East River", [-73.925, 40.756], -28],
+                  ["Upper Bay", [-74.045, 40.675], 0],
+                  ["Jamaica Bay", [-73.835, 40.615], -10],
+                ].map(([label, point, rotation]) => {
+                  const [x, y] = projectPoint(point as [number, number]);
+                  return (
+                    <text
+                      key={label as string}
+                      x={x}
+                      y={y}
+                      fill="#5BC0EB"
+                      fontSize="13"
+                      fontStyle="italic"
+                      fontWeight="700"
+                      opacity="0.76"
+                      textAnchor="middle"
+                      transform={`rotate(${rotation} ${x} ${y})`}
+                    >
+                      {label}
+                    </text>
+                  );
+                })}
+              </g>
+              <g>
+                {airportMarkers.map((marker) => (
+                  <AirportIcon key={marker.id} marker={marker} />
+                ))}
               </g>
               <g>
                 {taxiZoneFeatures.map((feature) => {
