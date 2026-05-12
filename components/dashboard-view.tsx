@@ -55,6 +55,7 @@ function isDashboardTab(value: string): value is DashboardTab {
 export function DashboardView() {
   const [selectedTab, setSelectedTab] = useState<DashboardTab>("summary");
   const [filters, setFilters] = useState(defaultFilters);
+  const [activePickupIndex, setActivePickupIndex] = useState(0);
 
   useEffect(() => {
     const hashTab = window.location.hash.replace("#", "");
@@ -88,6 +89,8 @@ export function DashboardView() {
       : filters.view === "volume"
         ? "Volume lens: Manhattan and sub-$25 fares dominate system load, so operating decisions should start with repeatable short trips."
         : "Portfolio lens: this dashboard separates demand concentration from per-trip value so the SQL findings do not collapse into one metric.";
+  const pickupMixRows = boroughMetrics.slice(0, 5);
+  const activePickup = pickupMixRows[activePickupIndex] ?? pickupMixRows[0];
 
   return (
     <main className="min-h-screen overflow-x-hidden px-3 py-4 md:px-7 md:py-6">
@@ -129,24 +132,52 @@ export function DashboardView() {
               </Panel>
 
               <Panel title="Pickup Mix" subtitle="Share of trips by pickup borough in the public taxi zone lookup.">
-                <div className="h-[280px] min-w-0">
+                <div className="h-[232px] min-w-0">
                   <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
+                    <PieChart margin={{ top: 4, right: 12, bottom: 4, left: 12 }}>
                       <text x="50%" y="45%" textAnchor="middle" fill="#F8FAFC" fontSize={28} fontWeight={700}>
-                        90.6%
+                        {activePickup.share.toFixed(1)}%
                       </text>
-                      <text x="50%" y="54%" textAnchor="middle" fill="#B8C4D6" fontSize={13} fontWeight={600}>
-                        Manhattan share
+                      <text x="50%" y="55%" textAnchor="middle" fill="#B8C4D6" fontSize={13} fontWeight={600}>
+                        {activePickup.borough}
                       </text>
-                      <Pie data={boroughMetrics.slice(0, 5)} dataKey="share" nameKey="borough" innerRadius="48%" outerRadius="78%" paddingAngle={2}>
-                        {boroughMetrics.slice(0, 5).map((segment, index) => (
-                          <Cell key={segment.borough} fill={chartColors[index % chartColors.length]} />
+                      <Pie
+                        data={pickupMixRows}
+                        dataKey="share"
+                        nameKey="borough"
+                        innerRadius="55%"
+                        outerRadius="82%"
+                        paddingAngle={2}
+                        stroke="#071321"
+                        strokeWidth={2}
+                        onMouseEnter={(_, index) => setActivePickupIndex(index)}
+                      >
+                        {pickupMixRows.map((segment, index) => (
+                          <Cell
+                            key={segment.borough}
+                            fill={chartColors[index % chartColors.length]}
+                            opacity={index === activePickupIndex ? 1 : 0.72}
+                          />
                         ))}
                       </Pie>
-                      <Tooltip formatter={(value: number) => `${value.toFixed(1)}% of trips`} />
-                      <Legend />
                     </PieChart>
                   </ResponsiveContainer>
+                </div>
+                <div className="grid grid-cols-2 gap-2 text-xs">
+                  {pickupMixRows.map((segment, index) => (
+                    <button
+                      key={segment.borough}
+                      type="button"
+                      aria-pressed={index === activePickupIndex}
+                      onClick={() => setActivePickupIndex(index)}
+                      className="flex min-w-0 items-center gap-2 rounded-[3px] border border-[#37577b] bg-[#10233d] px-2 py-1.5 text-left text-sand/86 transition hover:border-[#7bbdff] aria-pressed:border-[#f6c85f] aria-pressed:bg-[#173a5e]"
+                    >
+                      <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ backgroundColor: chartColors[index % chartColors.length] }} />
+                      <span className="min-w-0 truncate">
+                        {segment.borough} <span className="font-semibold text-ink">{segment.share.toFixed(1)}%</span>
+                      </span>
+                    </button>
+                  ))}
                 </div>
                 <button
                   type="button"

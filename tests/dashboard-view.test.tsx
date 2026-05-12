@@ -9,7 +9,7 @@ describe("DashboardView", () => {
 
     expect(screen.getByRole("heading", { name: /nyc taxi analytics dashboard/i })).toBeInTheDocument();
     expect(screen.getByText("102.9M")).toBeInTheDocument();
-    expect(screen.getByText("90.6%")).toBeInTheDocument();
+    expect(screen.getAllByText("90.6%").length).toBeGreaterThan(0);
   });
 
   it("switches to the query workflow tab", async () => {
