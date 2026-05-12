@@ -6,7 +6,7 @@ import { taxiZoneFeatures, TaxiZoneFeature } from "@/lib/taxi-zone-map";
 
 type MapMetric = "tripShare" | "avgRevenue";
 
-const svgWidth = 760;
+const svgWidth = 620;
 const svgHeight = 620;
 const boundsPadding = 28;
 
@@ -237,7 +237,7 @@ export function TaxiZoneMap({ selectedBorough }: { selectedBorough: string }) {
 
   return (
     <div className="grid min-w-0 gap-4 xl:grid-cols-[minmax(0,1.45fr)_minmax(320px,0.55fr)]">
-      <section className="rounded-[8px] border border-[#37577b] bg-[#0b1f35] p-4 md:p-5">
+      <section className="flex min-w-0 flex-col rounded-[8px] border border-[#37577b] bg-[#0b1f35] p-4 md:p-5">
         <div className="mb-4 flex flex-col gap-3 border-b border-[#26415f] pb-3 md:flex-row md:items-start md:justify-between">
           <div>
             <h2 className="text-lg font-semibold text-ink">Taxi-Zone Pickup Map</h2>
@@ -265,13 +265,13 @@ export function TaxiZoneMap({ selectedBorough }: { selectedBorough: string }) {
           </div>
         </div>
 
-        <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_210px]">
-          <div className="min-w-0 overflow-hidden rounded-[6px] border border-[#26415f] bg-[radial-gradient(circle_at_45%_40%,rgba(91,192,235,0.10),transparent_22rem),#071321]">
+        <div className="grid min-h-0 flex-1 gap-4 lg:grid-cols-[minmax(0,1fr)_210px]">
+          <div className="aspect-square min-w-0 overflow-hidden rounded-[6px] border border-[#26415f] bg-[radial-gradient(circle_at_45%_40%,rgba(91,192,235,0.10),transparent_22rem),#071321] lg:aspect-auto lg:min-h-[620px]">
             <svg
               aria-label={`Taxi-zone choropleth by ${activeMetricLabel}`}
               role="img"
               viewBox={`0 0 ${svgWidth} ${svgHeight}`}
-              className="block h-auto w-full"
+              className="block h-full w-full"
             >
               <rect width={svgWidth} height={svgHeight} fill="#071321" />
               <g opacity="0.85">
@@ -290,7 +290,7 @@ export function TaxiZoneMap({ selectedBorough }: { selectedBorough: string }) {
               <g opacity="0.42">
                 <path d="M219 40 C260 116 260 210 236 292 C214 366 216 451 256 552" stroke="#5BC0EB" strokeWidth="5" fill="none" />
                 <path d="M330 44 C313 135 323 226 350 312 C375 392 360 494 316 592" stroke="#5BC0EB" strokeWidth="3.2" fill="none" />
-                <path d="M70 390 C154 351 263 354 358 396 C438 431 515 431 650 385" stroke="#5BC0EB" strokeWidth="2.5" fill="none" />
+                <path d="M58 390 C126 351 214 354 292 396 C358 431 420 431 594 385" stroke="#5BC0EB" strokeWidth="2.5" fill="none" />
               </g>
               <g>
                 {basemapAreas
