@@ -5,3 +5,4 @@ dist/
 coverage/
 .env*.local
 npm-debug.log*
+.vercel

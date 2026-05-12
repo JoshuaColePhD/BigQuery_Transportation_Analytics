@@ -6,7 +6,7 @@ A city can have more than 100 million rides in a year and still leave leaders wi
 
 This project answers those questions with a compact SQL workflow on the Google BigQuery public NYC yellow taxi dataset, then translates the results into an executive dashboard styled after the HR Attrition survival dashboard.
 
-**Live dashboard:** deploy this repository to Vercel after connecting the project  
+**Live dashboard:** https://bigquery-transportation-push.vercel.app  
 **Dataset:** `bigquery-public-data.new_york_taxi_trips`
 
 ## The Story
@@ -121,7 +121,7 @@ npm run build
 npx vercel
 ```
 
-After deployment, replace the live dashboard line at the top of this README with the production Vercel URL.
+Production deployment: https://bigquery-transportation-push.vercel.app
 
 ## Project Structure
 
