@@ -118,7 +118,7 @@ export function DashboardView() {
           {selectedTab === "summary" ? (
             <div className="grid min-w-0 gap-4 xl:grid-cols-3">
               <Panel title="Weekly Traffic Baseline" subtitle="Monthly index of weekly trip volume, showing seasonality without a structural break.">
-                <div className="h-[280px] min-w-0">
+                <div className="min-h-[320px] min-w-0 flex-1">
                   <ResponsiveContainer width="100%" height="100%">
                     <AreaChart data={weeklyTraffic} margin={{ top: 8, right: 14, bottom: 8, left: 4 }}>
                       <CartesianGrid stroke="#2b6687" />
@@ -189,7 +189,7 @@ export function DashboardView() {
               </Panel>
 
               <Panel title="Fare Composition" subtitle="Trip volume is dominated by low-to-mid-priced rides.">
-                <div className="h-[280px] min-w-0">
+                <div className="min-h-[320px] min-w-0 flex-1">
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={selectedFareRows} margin={{ top: 10, right: 22, bottom: 8, left: 4 }}>
                       <CartesianGrid stroke="#2b6687" />
